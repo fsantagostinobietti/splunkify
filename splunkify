@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#
+# usage: $ splunkify.sh <command> <args...>
+#
+
+# $1 - output stream
+# $2 - log level
+function logit
+{
+  OUT='/dev/'$1
+  while read -r line; do
+    echo $(date +"%Y-%m-%d %T.%3N") $2 $line > $OUT
+  done
+}
+
+# use bash process substitution to process stderr
+eval "$*" 2> >(logit stderr ERROR) | logit stdout INFO
+
+# return 'eval $*' exit status
+exit ${PIPESTATUS[0]}
